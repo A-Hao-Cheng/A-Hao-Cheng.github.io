@@ -4,11 +4,11 @@
   
     
     <entry>
-      <title>Mysql主从搭建(Docker)</title>
-      <link href="/2022/05/11/Mysql%E4%B8%BB%E4%BB%8E%E6%90%AD%E5%BB%BA/"/>
-      <url>/2022/05/11/Mysql%E4%B8%BB%E4%BB%8E%E6%90%AD%E5%BB%BA/</url>
+      <title>Mysql主从复制原理</title>
+      <link href="/2022/05/12/MysqlMasterSlaveCopyTheory/"/>
+      <url>/2022/05/12/MysqlMasterSlaveCopyTheory/</url>
       
-        <content type="html"><![CDATA[<h3 id="Mysql-主从搭建"><a href="#Mysql-主从搭建" class="headerlink" title="Mysql 主从搭建"></a>Mysql 主从搭建</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">DROP</span> DATABASE Test;</span><br></pre></td></tr></table></figure>]]></content>
+        <content type="html"><![CDATA[<h3 id="1-主从复制流程"><a href="#1-主从复制流程" class="headerlink" title="1. 主从复制流程"></a>1. 主从复制流程</h3><div class="tabs" id=""><ul class="nav-tabs"><li class="tab active"><button type="button" data-href="#-1">master节点</button></li><li class="tab"><button type="button" data-href="#-2">slave节点</button></li></ul><div class="tab-contents"><div class="tab-item-content active" id="-1"><p>开启 binlog 后,并且 salve 节点连接到 master 节点后,会开启一个 <mark class="hl-label purple">binlog dump线程</mark>  ,当 master 的 binlog 产生变化时,该线程会通知 salve 节点,并推送对应的 binlog 至 slave</p><button type="button" class="tab-to-top" aria-label="scroll to top"><i class="fas fa-arrow-up"></i></button></div><div class="tab-item-content" id="-2"><p><mark class="hl-label purple">I&#x2F;O线程</mark> 负责接收 master 的 binlog dump 线程传输过来的 binlog 内容,并将内容写入自己的<mark class="hl-label purple">relay log(中继日志)</mark><br><mark class="hl-label purple">SQL线程</mark>  负责重放 relay log(中继日志)</p><button type="button" class="tab-to-top" aria-label="scroll to top"><i class="fas fa-arrow-up"></i></button></div></div></div><p><img src="http://cdn.maiscript.com/blog/mysql-master-slave-copy.png"></p><h3 id="2-常用复制方式"><a href="#2-常用复制方式" class="headerlink" title="2. 常用复制方式"></a>2. 常用复制方式</h3><h4 id="异步复制"><a href="#异步复制" class="headerlink" title="异步复制"></a>异步复制</h4><ul><li>master 并不关心 binlog 多久传输到 salve 节点,也不关心有没有传输到 salve 节点,完成事务后,直接提交</li><li>不能保证数据传输至 slave 节点,容易造成数据丢失</li><li><mark class="hl-label red">rpl_semi_sync_master_timeout</mark>  master 等待 slave 节点响应的超时时间,超时后,同步方式会转换成异步方式(默认 10s)<img src="http://cdn.maiscript.com/blog/mysql-sync.png"></li></ul><h4 id="半同步复制"><a href="#半同步复制" class="headerlink" title="半同步复制"></a>半同步复制</h4><ul><li>master 完成事务后,并不直接提交事务,需要等待至少一个 slave 节点 I&#x2F;O 线程写完 relay log 后,master 节点才提交事务</li><li>master 节点不需要等待 slave 节点 sql 线程重放 relay log</li></ul><p><img src="http://cdn.maiscript.com/blog/mysql-semis-repli.png"></p>]]></content>
       
       
       <categories>
@@ -22,7 +22,7 @@
             
             <tag> Mysql </tag>
             
-            <tag> Docker </tag>
+            <tag> 主从复制 </tag>
             
         </tags>
       
